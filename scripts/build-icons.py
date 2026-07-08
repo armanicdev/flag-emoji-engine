@@ -13,7 +13,7 @@ import re, subprocess, tempfile, pathlib, sys
 from PIL import Image
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-BRAND = "#027AFA"          # Flagoji brand blue (from assets/symbol.svg)
+BRAND = "#D97757"          # Flagoji brand — Claude orange
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 
 # --- read the traced mark -------------------------------------------------
