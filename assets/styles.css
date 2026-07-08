@@ -423,7 +423,7 @@
     .masthead__brand {
       display: inline-flex;
       align-items: center;
-      gap: 22px;
+      gap: 8px;
       line-height: 1;
     }
 
@@ -435,7 +435,7 @@
     }
 
     .masthead__brand-word {
-      height: 22px;
+      height: 19px;
       width: auto;
       display: block;
     }
