@@ -3,6 +3,8 @@
   <img src="assets/brand/logo-lockup-light.svg" alt="Flagoji" height="40">
 </picture>
 
+<br>
+
 Turn flag artwork into emoji-style previews for every major platform. Drop in an
 SVG, PNG, JPG, or WebP, tune it with live sliders, and export crisp PNGs — plus
 optional motion and animated GIF export.
