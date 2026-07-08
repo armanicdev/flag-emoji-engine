@@ -1,0 +1,14 @@
+.DS_Store
+.vercel/
+node_modules/
+*.log
+.env
+.cursor/
+*.mp4
+*.mov
+*.zip
+*.tar.gz
+lighthouse-report.json
+*.report.html
+dist/
+assets/styles.min.css

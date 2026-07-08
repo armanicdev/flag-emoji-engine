@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description"
+    content="Convert flag artwork (SVG, PNG, JPG, WebP) into emoji-style PNGs for major platforms. Upload, preview, download.">
+  <title>Flagoji</title>
+  <link rel="preload" href="assets/fonts/ranade-300.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/archivo-600.woff2" as="font" type="font/woff2" crossorigin>
+  <!-- Resource hints for optional dynamic import (web-haptics) -->
+  <link rel="preconnect" href="https://esm.sh">
+  <link rel="dns-prefetch" href="https://esm.sh">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+
+<body class="app--booting" aria-busy="true">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <div id="app-loading" class="app-loading app-loading--overlay" role="status" aria-busy="true" aria-live="polite">
+    <span class="visually-hidden">Loading application</span>
+    <div class="app-loading__spinner app-loading__spinner--overlay" aria-hidden="true"></div>
+  </div>
+
+  <div id="app-main" class="app-main" inert aria-hidden="true">
+    <div class="shell">
+      <header class="masthead app-reveal app-reveal--1">
+        <h1 id="site-title">Flagoji</h1>
+        <button type="button" class="gif-toggle interactable" data-type="refresh" id="gifToggle" aria-pressed="false"
+          aria-label="Toggle animated preview and GIF export">
+          <svg class="gif-toggle__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+            stroke-linejoin="round" aria-hidden="true">
+            <polyline points="23 4 23 10 17 10" />
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+          </svg>
+          <span class="gif-toggle__label">Motion</span>
+        </button>
+      </header>
+
+      <main id="main-content" class="main-stack app-reveal app-reveal--2" aria-labelledby="site-title">
+        <div class="layout-workspace">
+          <aside class="col-params" aria-label="Per-platform parameters">
+            <section class="tuning-block" id="tuningPanel" hidden>
+              <div class="param-groups" id="sliders"></div>
+            </section>
+          </aside>
+          <div class="layout-divider" aria-hidden="true"></div>
+          <div class="col-work" aria-label="Upload and previews">
+            <section class="col-input" aria-labelledby="upload-heading">
+              <h2 id="upload-heading" class="section-label">Upload Flag</h2>
+              <label class="upload-area interactable" data-type="upload" id="dropZone" for="fileInput">
+                <span id="dropZone-desc">Drop a file here, or activate to choose — SVG, PNG, JPG, or WebP.</span>
+              </label>
+              <input type="file" id="fileInput"
+                accept=".svg,.png,.jpg,.jpeg,.webp,image/svg+xml,image/png,image/jpeg,image/webp"
+                aria-describedby="dropZone-desc" aria-label="Choose flag image file" class="visually-hidden">
+              <div class="error-msg" id="errorMsg" role="alert" aria-live="assertive" hidden></div>
+            </section>
+
+            <section class="block-output" aria-labelledby="previews-heading">
+              <h2 id="previews-heading" class="visually-hidden">Platform previews</h2>
+              <div class="output-controls" id="outputControls" hidden>
+                <div class="output-controls__row output-controls__row--wide">
+                  <div class="output-controls__option-row" role="radiogroup" aria-labelledby="export-size-label">
+                    <span id="export-size-label" class="output-controls__option-label">Export size</span>
+                    <div class="output-controls__option-btns">
+                      <button type="button" class="scale-btn" role="radio" aria-checked="false" data-scale="0.5"
+                        aria-label="Export at half resolution">0.5×</button>
+                      <button type="button" class="scale-btn active" role="radio" aria-checked="true" data-scale="1"
+                        aria-label="Export at 1× resolution">1×</button>
+                      <button type="button" class="scale-btn" role="radio" aria-checked="false" data-scale="2"
+                        aria-label="Export at 2× resolution">2×</button>
+                      <button type="button" class="scale-btn" role="radio" aria-checked="false" data-scale="3"
+                        aria-label="Export at 3× resolution">3×</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="output-controls__row output-controls__row--wide">
+                  <div class="output-controls__option-row" role="radiogroup" aria-labelledby="gif-speed-label">
+                    <span id="gif-speed-label" class="output-controls__option-label">GIF speed</span>
+                    <div class="output-controls__option-btns">
+                      <button type="button" class="gif-speed-btn active" role="radio" aria-checked="true"
+                        data-gif-speed="1" aria-label="GIF export at normal speed">1×</button>
+                      <button type="button" class="gif-speed-btn" role="radio" aria-checked="false" data-gif-speed="1.5"
+                        aria-label="GIF export one and a half times faster">1.5×</button>
+                      <button type="button" class="gif-speed-btn" role="radio" aria-checked="false" data-gif-speed="2"
+                        aria-label="GIF export twice as fast">2×</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="output-controls__row output-controls__row--wide">
+                  <div class="output-controls__option-row" aria-labelledby="other-options-label">
+                    <span id="other-options-label" class="output-controls__option-label">Other options</span>
+                    <div class="output-controls__option-btns output-controls__option-btns--toggles">
+                      <button type="button" class="aa-toggle active interactable" data-type="aa" id="aaToggle"
+                        aria-pressed="true" aria-label="Toggle canvas smoothing">Smoothing</button>
+                      <button type="button" class="fit-toggle interactable" data-type="fit" id="fitToggle"
+                        aria-pressed="false" aria-label="Stretch artwork to fill the entire flag frame">Fit</button>
+                      <button type="button" class="transparent-toggle active interactable" data-type="transparent"
+                        id="transparentToggle" aria-pressed="true"
+                        aria-label="Transparent export without drop shadow; turn off for shadow on a solid background">Transparent</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p class="empty-output" id="outputPlaceholder">Previews appear after you add artwork.</p>
+              <div class="previews" id="previewsContainer" hidden>
+                <article class="preview-card" id="card-apple">
+                  <button type="button" class="preview-header interactable" data-type="download" data-variant="apple"
+                    aria-label="Apple row: header control to save PNG or GIF">
+                    <h3>Apple</h3>
+                    <svg class="preview-download__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                  </button>
+                  <canvas class="preview-canvas interactable" data-type="download" data-variant="apple"
+                    id="preview-apple" width="256" height="256" role="img"
+                    aria-label="Apple row: preview canvas; save PNG or GIF from here"></canvas>
+                </article>
+                <article class="preview-card" id="card-twitter">
+                  <button type="button" class="preview-header interactable" data-type="download" data-variant="twitter"
+                    aria-label="Twitter row: header control to save PNG or GIF">
+                    <h3>Twitter</h3>
+                    <svg class="preview-download__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                  </button>
+                  <canvas class="preview-canvas interactable" data-type="download" data-variant="twitter"
+                    id="preview-twitter" width="256" height="256" role="img"
+                    aria-label="Twitter row: preview canvas; save PNG or GIF from here"></canvas>
+                </article>
+                <article class="preview-card" id="card-samsung">
+                  <button type="button" class="preview-header interactable" data-type="download" data-variant="samsung"
+                    aria-label="Samsung row: header control to save PNG or GIF">
+                    <h3>Samsung</h3>
+                    <svg class="preview-download__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                  </button>
+                  <canvas class="preview-canvas interactable" data-type="download" data-variant="samsung"
+                    id="preview-samsung" width="256" height="256" role="img"
+                    aria-label="Samsung row: preview canvas; save PNG or GIF from here"></canvas>
+                </article>
+                <article class="preview-card" id="card-google">
+                  <button type="button" class="preview-header interactable" data-type="download" data-variant="google"
+                    aria-label="Google row: header control to save PNG or GIF">
+                    <h3>Google</h3>
+                    <svg class="preview-download__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                  </button>
+                  <canvas class="preview-canvas interactable" data-type="download" data-variant="google"
+                    id="preview-google" width="256" height="256" role="img"
+                    aria-label="Google row: preview canvas; save PNG or GIF from here"></canvas>
+                </article>
+                <article class="preview-card" id="card-huawei">
+                  <button type="button" class="preview-header interactable" data-type="download" data-variant="huawei"
+                    aria-label="Huawei row: header control to save PNG or GIF">
+                    <h3>Huawei</h3>
+                    <svg class="preview-download__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                  </button>
+                  <canvas class="preview-canvas interactable" data-type="download" data-variant="huawei"
+                    id="preview-huawei" width="256" height="256" role="img"
+                    aria-label="Huawei row: preview canvas; save PNG or GIF from here"></canvas>
+                </article>
+                <article class="preview-card" id="card-whatsapp">
+                  <button type="button" class="preview-header interactable" data-type="download" data-variant="whatsapp"
+                    aria-label="WhatsApp row: header control to save PNG or GIF">
+                    <h3>WhatsApp</h3>
+                    <svg class="preview-download__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                  </button>
+                  <canvas class="preview-canvas interactable" data-type="download" data-variant="whatsapp"
+                    id="preview-whatsapp" width="256" height="256" role="img"
+                    aria-label="WhatsApp row: preview canvas; save PNG or GIF from here"></canvas>
+                </article>
+                <article class="preview-card" id="card-circle1x1">
+                  <button type="button" class="preview-header interactable" data-type="download"
+                    data-variant="circle1x1" aria-label="Circle 1:1 row: header control to save PNG or GIF">
+                    <h3>Circle 1:1</h3>
+                    <svg class="preview-download__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                  </button>
+                  <canvas class="preview-canvas interactable" data-type="download" data-variant="circle1x1"
+                    id="preview-circle1x1" width="256" height="256" role="img"
+                    aria-label="Circle 1:1 row: preview canvas; save PNG or GIF from here"></canvas>
+                </article>
+                <article class="preview-card" id="card-rounded1x1">
+                  <button type="button" class="preview-header interactable" data-type="download"
+                    data-variant="rounded1x1" aria-label="Rounded 1:1 row: header control to save PNG or GIF">
+                    <h3>Rounded 1:1</h3>
+                    <svg class="preview-download__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                  </button>
+                  <canvas class="preview-canvas interactable" data-type="download" data-variant="rounded1x1"
+                    id="preview-rounded1x1" width="256" height="256" role="img"
+                    aria-label="Rounded 1:1 row: preview canvas; save PNG or GIF from here"></canvas>
+                </article>
+                <article class="preview-card" id="card-physicsWave">
+                  <button type="button" class="preview-header interactable" data-type="download"
+                    data-variant="physicsWave" aria-label="Physics row: header control to save PNG or GIF">
+                    <h3>Physics</h3>
+                    <svg class="preview-download__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                  </button>
+                  <canvas class="preview-canvas interactable" data-type="download" data-variant="physicsWave"
+                    id="preview-physicsWave" width="256" height="256" role="img"
+                    aria-label="Physics row: preview canvas; save PNG or GIF from here"></canvas>
+                </article>
+              </div>
+            </section>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer class="flowers-bottom" aria-label="Site footer">
+    <img class="flowers-bottom__img" src="assets/images/flowers-1200.webp"
+      srcset="assets/images/flowers-1200.webp 1200w, assets/images/flowers-2400.webp 2400w"
+      sizes="(max-width: 640px) 200vw, 100vw" alt="" width="1200" height="213" decoding="async" fetchpriority="low"
+      loading="lazy" aria-hidden="true">
+    <div class="flowers-bottom__overlay" aria-hidden="true"></div>
+    <div class="flowers-bottom__brand">
+      <p class="flowers-bottom__credit">
+        <span class="flowers-bottom__credit-part">Made with love by</span>
+        <img class="flowers-bottom__credit-logo" src="assets/images/logo.svg" alt="Armanic logo" width="20" height="18"
+          loading="lazy" decoding="async">
+        <span class="flowers-bottom__credit-part">Armanic</span>
+      </p>
+    </div>
+  </footer>
+
+  <div id="trailer" aria-hidden="true">
+    <div id="trailer-icon"></div>
+  </div>
+
+  <!-- Critical loader -->
+  <script src="src/flagoji-loader-boot.js" defer></script>
+  <!-- Non-critical smooth scrolling - load async -->
+  <script src="assets/vendor/lenis.min.js" async></script>
+  <!-- Main app module -->
+  <script src="src/main.js" type="module"></script>
+</body>
+
+</html>
