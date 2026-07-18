@@ -2,7 +2,7 @@
 """Generate the Flagoji favicon / app-icon set from assets/symbol.svg.
 
 Reproducible: reads the traced mark, composes two icon masters
-(rounded tile for the browser favicon, full-bleed square for Apple/Android
+(circular tile for the browser favicon, full-bleed square for Apple/Android
 per their platform guidance), rasterises every PNG size with headless
 Chrome, and assembles a multi-resolution favicon.ico.
 
@@ -36,13 +36,14 @@ def svg(tile):
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {TILE} {TILE}">'
             f'{tile}{mark}</svg>')
 
-ROUNDED = svg(f'<rect width="{TILE}" height="{TILE}" rx="115" fill="{BRAND}"/>')  # transparent corners
-SQUARE  = svg(f'<rect width="{TILE}" height="{TILE}" fill="{BRAND}"/>')            # full-bleed, opaque
+CIRCLE = svg(f'<circle cx="{TILE/2:.0f}" cy="{TILE/2:.0f}" r="{TILE/2:.0f}" fill="{BRAND}"/>')  # transparent outside the disc
+SQUARE = svg(f'<rect width="{TILE}" height="{TILE}" fill="{BRAND}"/>')                           # full-bleed, opaque
 
 (ROOT / "assets/brand").mkdir(parents=True, exist_ok=True)
-(ROOT / "favicon.svg").write_text(ROUNDED)
-(ROOT / "assets/brand/icon-rounded.svg").write_text(ROUNDED)
+(ROOT / "favicon.svg").write_text(CIRCLE)
+(ROOT / "assets/brand/icon-circle.svg").write_text(CIRCLE)
 (ROOT / "assets/brand/icon-square.svg").write_text(SQUARE)
+(ROOT / "assets/brand/icon-rounded.svg").unlink(missing_ok=True)
 
 # --- rasterise via headless Chrome ---------------------------------------
 # Headless Chrome clamps very small window sizes, so we render each master once
@@ -74,17 +75,17 @@ def png(master, size, out):
     (master if size == RENDER_AT else master.resize((size, size), Image.LANCZOS)).save(out)
 
 square = render_master(SQUARE, transparent=False)
-rounded = render_master(ROUNDED, transparent=True)
+circle = render_master(CIRCLE, transparent=True)
 
 # opaque, full-bleed PNGs for Apple / Android (per platform guidance)
 png(square, 180, ROOT / "apple-touch-icon.png")
 png(square, 192, ROOT / "icon-192.png")
 png(square, 512, ROOT / "icon-512.png")
 
-# favicon.ico: multi-size 16/32/48 from the rounded master (transparent corners)
-rounded.save(ROOT / "favicon.ico", format="ICO", sizes=[(16, 16), (32, 32), (48, 48)])
+# favicon.ico: multi-size 16/32/48 from the circular master (transparent outside the disc)
+circle.save(ROOT / "favicon.ico", format="ICO", sizes=[(16, 16), (32, 32), (48, 48)])
 
 print("wrote:", ", ".join([
     "favicon.svg", "favicon.ico", "apple-touch-icon.png",
     "icon-192.png", "icon-512.png",
-    "assets/brand/icon-rounded.svg", "assets/brand/icon-square.svg"]))
+    "assets/brand/icon-circle.svg", "assets/brand/icon-square.svg"]))
